@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PhishNet AI — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}"/>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo"><div class="logo-icon">🛡️</div><div><div class="logo-text">PHISHNET AI</div><div class="logo-sub">PHISHING DETECTION SYSTEM</div></div></div>
+    <div class="header-right">
+      <div class="status-dot"></div><div class="status-label">SYSTEM ONLINE</div>
+      <div class="user-chip" id="userChip">...</div>
+      <button class="btn-logout" onclick="logout()">LOGOUT</button>
+    </div>
+  </header>
+  <div class="main">
+    <aside class="sidebar">
+      <div class="nav-section">NAVIGATION</div>
+      <div class="nav-item active" onclick="showSection('dashboard')"><span class="icon">📊</span> Dashboard</div>
+      <div class="nav-item" onclick="showSection('analyze')"><span class="icon">🔍</span> Analyze Email</div>
+      <div class="nav-item" onclick="showSection('history')"><span class="icon">📋</span> Scan History</div>
+      <div class="nav-item" onclick="showSection('threats')"><span class="icon">⚠️</span> Threat Intel</div>
+      <div class="nav-section">TOOLS</div>
+      <div class="nav-item" onclick="showSection('apikey')"><span class="icon">🔑</span> API Key</div>
+      <div class="nav-item" onclick="exportCSV()"><span class="icon">📄</span> Export CSV</div>
+      <div class="nav-item" onclick="exportPDF()"><span class="icon">📑</span> Export PDF</div>
+      <div class="nav-section">COMPLIANCE</div>
+      <div class="nav-item"><span class="icon">✅</span> ISO 27001</div>
+      <div class="nav-item"><span class="icon">🔒</span> GDPR</div>
+      <div class="nav-item"><span class="icon">📐</span> NIST CSF</div>
+      <div id="adminNav" style="display:none;">
+        <div class="nav-section">ADMIN</div>
+        <div class="nav-item" onclick="showSection('admin')"><span class="icon">👑</span> Admin Panel</div>
+      </div>
+    </aside>
+    <main class="content">
+
+      <!-- DASHBOARD -->
+      <section id="sec-dashboard">
+        <div class="page-title">DASHBOARD <span>// REAL-TIME MONITORING</span></div>
+        <div class="stats-grid">
+          <div class="stat-card total"><div class="stat-label">TOTAL ANALYZED</div><div class="stat-value" id="statTotal">0</div><div class="stat-delta">All time scans</div></div>
+          <div class="stat-card safe"><div class="stat-label">SAFE</div><div class="stat-value" id="statSafe">0</div><div class="stat-delta" id="statSafePct">—</div></div>
+          <div class="stat-card suspicious"><div class="stat-label">SUSPICIOUS</div><div class="stat-value" id="statSus">0</div><div class="stat-delta" id="statSusPct">—</div></div>
+          <div class="stat-card phishing"><div class="stat-label">PHISHING</div><div class="stat-value" id="statPhish">0</div><div class="stat-delta" id="statPhishPct">—</div></div>
+        </div>
+        <div class="chart-panel">
+          <div class="panel-title">📈 7-DAY SCAN TREND</div>
+          <canvas id="trendChart" width="800" height="140"></canvas>
+        </div>
+        <div class="table-panel">
+          <div style="padding:16px 16px 0"><div class="panel-title">📥 RECENT SCANS</div></div>
+          <div class="table-header-row"><div>PREVIEW</div><div>VERDICT</div><div>RISK</div><div></div><div>TIME</div></div>
+          <div id="recentScans"><div class="empty-state">No scans yet.</div></div>
+        </div>
+      </section>
+
+      <!-- ANALYZE -->
+      <section id="sec-analyze" style="display:none">
+        <div class="page-title">ANALYZE EMAIL <span>// ML DETECTION</span></div>
+        <div class="analyze-panel">
+          <div class="panel-title">🔬 PASTE EMAIL CONTENT</div>
+          <textarea class="email-input" id="emailInput" placeholder="Paste full email here — Subject, From, Body, Links..."></textarea>
+          <div class="analyze-row">
+            <button class="btn-analyze" onclick="analyzeEmail()">⚡ ANALYZE</button>
+            <button class="btn-clear" onclick="clearAnalyze()">CLEAR</button>
+            <span class="token-counter" id="charCount">0 chars</span>
+            <div class="sample-links">SAMPLES: <span class="sample-link phish" onclick="loadSample('phish')">⛔ PHISHING</span> <span class="sample-link safe" onclick="loadSample('safe')">✅ SAFE</span></div>
+          </div>
+          <div class="result-box" id="resultBox">
+            <div class="result-header">
+              <span id="resultEmoji" style="font-size:24px"></span>
+              <div><div class="result-verdict" id="resultVerdict"></div><div class="result-sub" id="resultSub"></div><div class="confidence-val" id="confidenceVal"></div></div>
+            </div>
+            <div class="result-body">
+              <div class="risk-meter">
+                <div class="risk-label">RISK PROBABILITY SCORE</div>
+                <div class="risk-score" id="riskScore">0%</div>
+                <div class="risk-bar-bg"><div class="risk-bar-fill" id="riskBar"></div></div>
+                <div class="model-label">Model: TF-IDF + Logistic Regression</div>
+              </div>
+              <div class="flags-list" id="flagsList"></div>
+            </div>
+            <div class="result-extra">
+              <div>
+                <div class="risk-label" style="margin-bottom:8px">🔑 TRIGGER KEYWORDS</div>
+                <div class="kw-tags" id="keywordsList"></div>
+              </div>
+              <div>
+                <div class="risk-label" style="margin-bottom:8px">📧 HEADER ANALYSIS</div>
+                <div id="headerInfo"></div>
+              </div>
+            </div>
+            <div style="padding:0 20px 16px" id="feedbackArea"></div>
+          </div>
+          <div class="scanning-overlay" id="scanOverlay"><div class="scan-ring"></div><div class="scan-text">SCANNING...</div></div>
+        </div>
+      </section>
+
+      <!-- HISTORY -->
+      <section id="sec-history" style="display:none">
+        <div class="page-title">SCAN HISTORY <span>// AUDIT TRAIL</span></div>
+        <div style="display:flex;gap:10px;margin-bottom:16px">
+          <button class="btn-export" onclick="exportCSV()">📄 Export CSV</button>
+          <button class="btn-export" onclick="exportPDF()">📑 Export PDF</button>
+        </div>
+        <div class="table-panel">
+          <div class="table-header-row"><div>PREVIEW</div><div>VERDICT</div><div>RISK</div><div>FLAGS</div><div>TIME / FEEDBACK</div></div>
+          <div id="historyList"><div class="empty-state">Loading...</div></div>
+        </div>
+      </section>
+
+      <!-- THREATS -->
+      <section id="sec-threats" style="display:none">
+        <div class="page-title">THREAT INTEL <span>// CATEGORY BREAKDOWN</span></div>
+        <div class="bottom-grid">
+          <div class="threat-panel">
+            <div class="panel-title">🎯 THREAT CATEGORIES</div>
+            <div class="threat-categories">
+              <div class="threat-row"><div class="threat-info"><span>Credential Harvesting</span><span class="threat-pct">38%</span></div><div class="threat-bar-bg"><div class="threat-bar-fill" style="width:38%;background:linear-gradient(to right,#ff3c6e,#cc0040)"></div></div></div>
+              <div class="threat-row"><div class="threat-info"><span>Financial Fraud</span><span class="threat-pct">27%</span></div><div class="threat-bar-bg"><div class="threat-bar-fill" style="width:27%;background:linear-gradient(to right,#ff8c00,#ffaa00)"></div></div></div>
+              <div class="threat-row"><div class="threat-info"><span>Malware / Ransomware</span><span class="threat-pct">19%</span></div><div class="threat-bar-bg"><div class="threat-bar-fill" style="width:19%;background:linear-gradient(to right,#ff3c6e,#ff8c00)"></div></div></div>
+              <div class="threat-row"><div class="threat-info"><span>CEO Impersonation</span><span class="threat-pct">10%</span></div><div class="threat-bar-bg"><div class="threat-bar-fill" style="width:10%;background:linear-gradient(to right,#aa00ff,#7700cc)"></div></div></div>
+              <div class="threat-row"><div class="threat-info"><span>Spear Phishing</span><span class="threat-pct">6%</span></div><div class="threat-bar-bg"><div class="threat-bar-fill" style="width:6%;background:linear-gradient(to right,#00e5ff,#0088cc)"></div></div></div>
+            </div>
+          </div>
+          <div class="threat-panel">
+            <div class="panel-title">🔒 ENCRYPTION STATUS</div>
+            <div class="enc-badges">
+              <div class="enc-badge">AES-256 ✓ ACTIVE</div>
+              <div class="enc-badge">SHA-256 HASH ✓</div>
+              <div class="enc-badge">BLOCKCHAIN LOG ✓</div>
+              <div class="enc-badge compliance">ISO 27001 | GDPR | NIST</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- API KEY -->
+      <section id="sec-apikey" style="display:none">
+        <div class="page-title">API KEY <span>// DEVELOPER ACCESS</span></div>
+        <div class="api-panel">
+          <div class="panel-title">🔑 YOUR API KEY</div>
+          <div class="api-key-box" id="apiKeyVal">Loading...</div>
+          <div class="api-actions">
+            <button class="btn-api" onclick="copyApiKey()">📋 Copy</button>
+            <button class="btn-api" onclick="regenApiKey()">🔄 Regenerate</button>
+          </div>
+          <div class="panel-title">💻 USAGE EXAMPLE</div>
+          <div class="code-block">curl -X POST https://your-app.onrender.com/api/analyze \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -d '{"email_text": "Paste email here"}'
+
+# Response:
+{
+  "verdict": "PHISHING",
+  "score": 94.0,
+  "confidence": 96.2,
+  "flags": ["Urgency language detected", "Suspicious domain"],
+  "keywords": ["urgent", "verify", "suspended"]
+}</div>
+        </div>
+      </section>
+
+      <!-- ADMIN -->
+      <section id="sec-admin" style="display:none">
+        <div class="page-title">ADMIN PANEL <span>// ALL USERS</span></div>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-card total"><div class="stat-label">TOTAL USERS</div><div class="stat-value" id="adminTotalUsers">0</div></div>
+          <div class="stat-card suspicious"><div class="stat-label">TOTAL SCANS</div><div class="stat-value" id="adminTotalScans">0</div></div>
+          <div class="stat-card phishing"><div class="stat-label">PHISHING CAUGHT</div><div class="stat-value" id="adminTotalPhish">0</div></div>
+        </div>
+        <div class="table-panel" style="margin-top:20px">
+          <div style="padding:16px 16px 0"><div class="panel-title">👥 ALL USERS</div></div>
+          <div class="table-header-row"><div>USERNAME</div><div>EMAIL</div><div>ROLE</div><div>SCANS</div><div>JOINED</div></div>
+          <div id="adminUsersList"><div class="empty-state">Loading...</div></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body></html>
