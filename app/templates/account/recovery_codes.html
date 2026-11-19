@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block title %}Recovery codes{% endblock %}
+{% block content %}<h1>Your recovery codes</h1><div class="card"><div class="alert alert-warning">Save these now. They are shown only once; each works a single time.</div>
+<pre id="codes" class="keybox mono">{% for c in codes %}{{ c }}
+{% endfor %}</pre><button class="btn secondary small" data-copy="#codes" type="button">Copy</button>
+<p><a href="{{ url_for('account.settings') }}">Back to account</a></p></div>{% endblock %}

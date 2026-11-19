@@ -1,0 +1,10 @@
+{% extends "auth/_layout.html" %}{% block title %}Reset password{% endblock %}
+{% block heading %}Reset your password{% endblock %}
+{% block sub %}Enter your email and we will send a single-use link (valid 30 minutes).{% endblock %}
+{% block form %}
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="email">Email</label><input id="email" type="email" name="email" autocomplete="username" required>
+  <p><button class="btn block" type="submit">Send reset link</button></p>
+</form>
+<p class="small center"><a href="{{ url_for('auth.login') }}">Back to sign in</a></p>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "auth/_layout.html" %}{% block title %}Choose a new password{% endblock %}
+{% block heading %}Choose a new password{% endblock %}
+{% block sub %}You will be signed out of all devices.{% endblock %}
+{% block form %}
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="password">New password</label><div class="pw-field"><input id="password" type="password" name="password" autocomplete="new-password" minlength="10" data-strength="#strength" required><button type="button" data-pw-toggle="#password" data-icons="{{ url_for('static', filename='images/icons.svg') }}" aria-label="Show password">{{ icon('eye') }}</button></div>
+  <div class="strength" id="strength" data-level="0"><i></i><i></i><i></i><i></i><span class="strength-text"></span></div>
+  <label for="confirm_password">Confirm password</label><div class="pw-field"><input id="confirm_password" type="password" name="confirm_password" autocomplete="new-password"  required><button type="button" data-pw-toggle="#confirm_password" data-icons="{{ url_for('static', filename='images/icons.svg') }}" aria-label="Show password">{{ icon('eye') }}</button></div>
+  <p><button class="btn block" type="submit">Update password</button></p>
+</form>
+{% endblock %}

@@ -1,0 +1,86 @@
+{
+  "version": "v20261117123506",
+  "artifact": "model.joblib",
+  "sha256": "0ab0ba88e3da163b113b6e47bc12503bba158af738279c45b58727a4c87421dd",
+  "trained_at": "2026-11-17T12:35:06.544971+00:00",
+  "seed": 42,
+  "sklearn_version": "1.7.2",
+  "numpy_version": "2.3.5",
+  "dataset": {
+    "rows": 692,
+    "class_counts": {
+      "1": 432,
+      "0": 260
+    },
+    "warnings": [
+      "96% of rows are template-generated synthetic data; metrics are optimistic."
+    ],
+    "cleaning": {
+      "missing_dropped": 0,
+      "invalid_labels_dropped": 0,
+      "too_short_dropped": 0,
+      "duplicates_dropped": 538,
+      "conflicting_duplicates_dropped": 0
+    }
+  },
+  "metrics": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "confusion_matrix": [
+      [
+        52,
+        0
+      ],
+      [
+        0,
+        87
+      ]
+    ],
+    "confusion_matrix_labels": [
+      "SAFE(0)",
+      "PHISHING(1)"
+    ],
+    "classification_report": {
+      "safe": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 52.0
+      },
+      "phishing": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 87.0
+      },
+      "accuracy": 1.0,
+      "macro avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 139.0
+      },
+      "weighted avg": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 139.0
+      }
+    },
+    "cv_best_f1_mean": 1.0,
+    "best_params": {
+      "clf__C": 1.0,
+      "tfidf__max_features": 5000,
+      "tfidf__min_df": 1,
+      "tfidf__ngram_range": [
+        1,
+        1
+      ]
+    },
+    "n_train": 553,
+    "n_test": 139
+  },
+  "caveats": "Score is a model-derived risk indicator, not a calibrated probability. Metrics are on a held-out split of THIS dataset only."
+}

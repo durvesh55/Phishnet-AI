@@ -1,0 +1,16 @@
+[tool.ruff]
+line-length = 140
+target-version = "py312"
+extend-exclude = ["legacy", "migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP", "S"]
+ignore = ["E501", "S101", "S311", "B008", "UP037", "S608"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "B"]
+"scripts/*" = ["S"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]

@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block title %}Account{% endblock %}
+{% block content %}<h1>Account settings</h1>
+<div class="card"><h2>Profile &amp; privacy</h2><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label for="name">Name</label><input id="name" type="text" name="name" value="{{ user.name }}" maxlength="100" required>
+<p class="muted small">Email: {{ user.email }}</p>
+<div class="checks"><label><input type="checkbox" name="store_email_text" {{ 'checked' if user.store_email_text }}> Store the full text of scanned emails (otherwise only the result, a hash and length are kept)</label>
+<label><input type="checkbox" name="otp_enabled" {{ 'checked' if user.otp_enabled }}> Require email one-time code at sign-in (recommended)</label></div>
+<label for="retention_days">Automatically delete scans older than</label>
+<select id="retention_days" name="retention_days">{% for v,l in [(0,'Never (keep until I delete)'),(7,'7 days'),(30,'30 days'),(90,'90 days'),(365,'1 year')] %}<option value="{{ v }}" {{ 'selected' if user.retention_days==v }}>{{ l }}</option>{% endfor %}</select>
+<p><button class="btn" type="submit">Save</button></p></form></div>
+<div class="card"><h2>Change password</h2><form method="post" action="{{ url_for('account.change_password') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label for="cp">Current password</label><input id="cp" type="password" name="current_password" autocomplete="current-password" required>
+<label for="np">New password</label><input id="np" type="password" name="new_password" autocomplete="new-password" required>
+<label for="cf">Confirm</label><input id="cf" type="password" name="confirm_password" autocomplete="new-password" required>
+<p><button class="btn" type="submit">Change password</button></p></form></div>
+<div class="card"><h2>Recovery codes</h2><p class="small muted">One-time codes to sign in if you lose access to your email OTP. Generating new codes invalidates the old ones.</p>
+<form method="post" action="{{ url_for('account.recovery_codes') }}" data-confirm="Generate new recovery codes? Old codes stop working."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn secondary" type="submit">Generate recovery codes</button></form></div>
+<div class="card"><h2>Your data</h2><p><a class="btn secondary" href="{{ url_for('account.export_data') }}">Download all my data (JSON)</a></p>
+<h2>Delete account</h2><p class="small muted">Permanently deletes your account, scans, feedback and API keys. This cannot be undone.</p>
+<form method="post" action="{{ url_for('account.delete_account') }}" data-confirm="This permanently deletes your account. Continue?"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label for="dp">Password</label><input id="dp" type="password" name="password" required>
+<label for="dc">Type DELETE to confirm</label><input id="dc" type="text" name="confirm" required>
+<p><button class="btn danger" type="submit">Delete my account</button></p></form></div>{% endblock %}

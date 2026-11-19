@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block title %}Privacy{% endblock %}
+{% block content %}<h1>Privacy policy (template)</h1><div class="card">
+<p class="small muted">Template — have it reviewed by legal counsel and fill in operator details before public launch.</p>
+<h2>What we process</h2><ul><li><strong>Account:</strong> name, email, salted password hash, sign-in security events.</li>
+<li><strong>Scans:</strong> the text you submit (unless you disable storage), its SHA-256 hash and length, the ML result, the rule findings and model version.</li>
+<li><strong>Feedback &amp; API keys:</strong> your correctness feedback; API key hashes (never raw keys), usage counters.</li></ul>
+<h2>What we do not do</h2><ul><li>Submitted emails are analysed locally and are not sent to external AI services.</li>
+<li>Links inside emails are never opened or fetched.</li><li>Your emails and feedback are not used to train models without your explicit consent.</li></ul>
+<h2>Your controls</h2><ul><li>Delete individual scans or your whole account at any time.</li><li>Export all your data as JSON.</li>
+<li>Choose a retention period or disable storage of email text in Account settings.</li></ul>
+<h2>Contact</h2><p>[Operator name and contact address]</p></div>{% endblock %}

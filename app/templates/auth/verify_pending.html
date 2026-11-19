@@ -1,0 +1,10 @@
+{% extends "auth/_layout.html" %}{% block title %}Verify your email{% endblock %}
+{% block heading %}Verify your email{% endblock %}
+{% block sub %}Open the link we emailed you (valid 24 hours). Need a new one?{% endblock %}
+{% block form %}
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="email">Email</label><input id="email" type="email" name="email" autocomplete="username" required>
+  <p><button class="btn block" type="submit">Resend verification email</button></p>
+</form>
+<p class="small center"><a href="{{ url_for('auth.login') }}">Back to sign in</a></p>
+{% endblock %}

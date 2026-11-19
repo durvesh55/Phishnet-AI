@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block bodyclass %}authpage{% endblock %}
+{% block flashes %}{% endblock %}
+{% block fullwidth %}
+<section class="auth-split">
+  <aside class="auth-side">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="auth-side-inner">
+      <a class="brand" href="{{ url_for('public.landing') }}"><img class="logo" src="{{ url_for('static', filename='images/logo.svg') }}" alt="" width="40" height="40"><span class="wm">PhishNet <span>AI</span></span></a>
+      <h2>Spot phishing before it spots you.</h2>
+      <ul class="ticks">
+        <li>Machine learning and transparent rules, shown separately</li>
+        <li>Every red flag comes with the evidence behind it</li>
+        <li>Links are analysed as text and never visited</li>
+        <li>Your scans stay private to your account</li>
+      </ul>
+    </div>
+  </aside>
+  <div class="auth-main">
+    <div class="theme-corner"><button class="icon-btn" type="button" data-theme-toggle aria-label="Toggle dark mode"><span class="theme-ico-light">{{ icon('moon') }}</span><span class="theme-ico-dark">{{ icon('sun') }}</span></button></div>
+    <div class="auth-panel">
+      <h1>{% block heading %}{% endblock %}</h1>
+      <p class="muted">{% block sub %}{% endblock %}</p>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in messages %}<div class="alert alert-{{ cat }}" role="alert">{{ msg }}</div>{% endfor %}
+      {% endwith %}
+      {% block form %}{% endblock %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="theme-color" content="#0b2260">
+  <meta name="description" content="PhishNet AI checks links and emails for phishing using machine learning and transparent security rules.">
+  <title>{% block title %}PhishNet AI{% endblock %} · PhishNet AI</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+{% set logo = url_for('static', filename='images/logo.svg') %}
+{% macro themebtn() %}<button class="icon-btn" type="button" data-theme-toggle aria-label="Toggle dark mode"><span class="theme-ico-light">{{ icon('moon') }}</span><span class="theme-ico-dark">{{ icon('sun') }}</span></button>{% endmacro %}
+
+{% if current_user %}
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="{{ url_for('dashboard.index') }}"><img class="logo" src="{{ logo }}" alt="" width="34" height="34"><span class="wm">PhishNet <span>AI</span></span></a>
+    <nav class="sidenav" aria-label="Main">
+      <a href="{{ url_for('dashboard.index') }}" class="{{ 'active' if request.endpoint == 'dashboard.index' }}">{{ icon('dashboard') }}Dashboard</a>
+      <a href="{{ url_for('scanner.new_scan') }}" class="{{ 'active' if request.endpoint == 'scanner.new_scan' }}">{{ icon('scan') }}Scan email</a>
+      <a href="{{ url_for('history.index') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('history') }}">{{ icon('history') }}History</a>
+      <a href="{{ url_for('account.api_keys') }}" class="{{ 'active' if request.endpoint == 'account.api_keys' }}">{{ icon('key') }}API keys</a>
+      <a href="/api/docs">{{ icon('code') }}API docs</a>
+      <a href="{{ url_for('account.settings') }}" class="{{ 'active' if request.endpoint == 'account.settings' }}">{{ icon('user') }}Account</a>
+    </nav>
+    <div class="sidebar-foot">
+      <button class="side-btn" type="button" data-theme-toggle><span class="theme-ico-light">{{ icon('moon') }}</span><span class="theme-ico-dark">{{ icon('sun') }}</span>Dark / light</button>
+      <div class="usercard"><div class="avatar">{{ current_user.name[:1]|upper }}</div><div><div class="nm">{{ current_user.name }}</div><div class="em">{{ current_user.email }}</div></div></div>
+      <form method="post" action="{{ url_for('auth.logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="side-btn" type="submit">{{ icon('logout') }}Log out</button></form>
+    </div>
+  </aside>
+  <div class="scrim" data-nav-close></div>
+  <div class="app-main">
+    <header class="app-top">
+      <button class="icon-btn" type="button" data-nav-toggle="#sidebar" aria-label="Open menu">{{ icon('menu') }}</button>
+      <a class="brand" href="{{ url_for('dashboard.index') }}"><img class="logo" src="{{ logo }}" alt="" width="28" height="28"><span class="wm">PhishNet <span>AI</span></span></a>
+      {{ themebtn() }}
+    </header>
+{% else %}
+<header class="topbar">
+  <a class="brand" href="{{ url_for('public.landing') }}"><img class="logo" src="{{ logo }}" alt="" width="34" height="34"><span class="wm">PhishNet <span>AI</span></span></a>
+  <nav id="mainnav" aria-label="Main">
+    <a href="{{ url_for('public.landing') }}#how">How it works</a>
+    <a href="{{ url_for('public.landing') }}#checks">What we check</a>
+    <a href="{{ url_for('public.landing') }}#faq">FAQ</a>
+    <a href="/api/docs">API</a>
+    <a href="{{ url_for('auth.login') }}">Sign in</a>
+    <a class="btn small" href="{{ url_for('auth.register') }}">Get started</a>
+  </nav>
+  <div class="topbar-tools">{{ themebtn() }}<button class="icon-btn nav-toggle" type="button" data-nav-toggle="#mainnav" aria-label="Menu">{{ icon('menu') }}</button></div>
+</header>
+{% block fullwidth %}{% endblock %}
+{% endif %}
+
+{% block flashes %}
+{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}
+<div class="toasts" role="status" aria-live="polite">
+  {% for cat, msg in messages %}<div class="toast toast-{{ cat }}"><span>{{ msg }}</span><button class="toast-x" type="button" aria-label="Dismiss">{{ icon('x') }}</button></div>{% endfor %}
+</div>{% endif %}{% endwith %}
+{% endblock %}
+
+<main class="container">
+  {% block content %}{% endblock %}
+</main>
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div><div class="brand"><img class="logo" src="{{ logo }}" alt="" width="30" height="30"><span class="wm">PhishNet <span>AI</span></span></div>
+      <p class="small">Link and email phishing analysis. Results are advisory indicators, not a guarantee of safety.</p></div>
+    <div><strong>Product</strong><a href="{{ url_for('public.landing') }}#how">How it works</a><a href="{{ url_for('public.landing') }}#checks">What we check</a><a href="/api/docs">API documentation</a></div>
+    <div><strong>Account</strong><a href="{{ url_for('auth.login') }}">Sign in</a><a href="{{ url_for('auth.register') }}">Create account</a></div>
+    <div><strong>Legal</strong><a href="{{ url_for('dashboard.privacy') }}">Privacy policy</a></div>
+  </div>
+  <div class="small footer-note">© PhishNet AI · Not independently security-audited · Submitted links are never visited.</div>
+</footer>
+{% if current_user %}</div></div>{% endif %}
+</body>
+</html>

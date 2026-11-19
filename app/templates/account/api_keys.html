@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block title %}API keys{% endblock %}
+{% block content %}<h1>API keys</h1>
+{% if new_key %}<div class="card"><div class="alert alert-warning">Copy your new key now — it will <strong>never be shown again</strong>.</div>
+<div class="keybox mono" id="newkey">{{ new_key }}</div><p><button class="btn secondary small" data-copy="#newkey" type="button">Copy</button></p>
+<p class="small muted">Example: <code>curl -H "X-API-Key: YOUR_KEY" -H "Content-Type: application/json" -d "{\"email_text\": \"...\"}" {{ request.host_url }}api/v1/scans</code></p></div>{% endif %}
+<div class="card"><h2>Create a key</h2><form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label for="name">Name</label><input id="name" type="text" name="name" maxlength="80" required>
+<label for="exp">Expires in (days, blank = never)</label><input id="exp" type="number" name="expires_in_days" min="1" max="730">
+<div class="checks"><strong class="small">Scopes</strong>{% for s in scopes %}<label><input type="checkbox" name="scopes" value="{{ s }}" checked> {{ s }}</label>{% endfor %}</div>
+<p><button class="btn" type="submit">Generate key</button></p></form></div>
+<div class="card"><h2>Your keys</h2>{% if keys %}<div class="table-wrap"><table><thead><tr><th>Name</th><th>Prefix</th><th>Status</th><th>Created</th><th>Expires</th><th>Last used</th><th>Uses</th><th></th></tr></thead><tbody>
+{% for k in keys %}<tr><td>{{ k.name }}<div class="small muted">{{ k.scopes }}</div></td><td class="mono">{{ k.prefix }}…</td><td><span class="badge b-{{ k.status }}">{{ k.status }}</span></td>
+<td>{{ k.created_at.strftime('%Y-%m-%d') }}</td><td>{{ k.expires_at.strftime('%Y-%m-%d') if k.expires_at else '—' }}</td><td>{{ k.last_used_at.strftime('%Y-%m-%d %H:%M') if k.last_used_at else 'never' }}</td><td>{{ k.usage_count }}</td>
+<td>{% if k.status == 'active' %}<form class="inline" method="post" action="{{ url_for('account.rotate_key', key_id=k.id) }}" data-confirm="Rotate? The old key stops working immediately."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn small secondary" type="submit">Rotate</button></form>
+<form class="inline" method="post" action="{{ url_for('account.revoke_key', key_id=k.id) }}" data-confirm="Revoke this key?"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn small danger" type="submit">Revoke</button></form>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="muted">No keys yet.</p>{% endif %}</div>{% endblock %}

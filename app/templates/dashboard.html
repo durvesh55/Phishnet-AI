@@ -1,0 +1,56 @@
+{% extends "base.html" %}{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="dash-head">
+  <div><h1>Hello, {{ current_user.name.split(' ')[0] }} 👋</h1><p class="muted">Here is what has been scanned in your account.</p></div>
+  <div class="actions"><a class="btn" href="{{ url_for('scanner.new_scan') }}">{{ icon('scan') }} New scan</a>
+    <a class="btn secondary" href="{{ url_for('history.index') }}">{{ icon('history') }} History</a></div>
+</div>
+
+<div class="grid grid-4">
+  <div class="card stat s-total lift"><div class="si">{{ icon('pulse') }}</div><div><div class="l">Total scans</div><div class="n" data-count="{{ stats.total }}">{{ stats.total }}</div></div></div>
+  <div class="card stat s-safe lift"><div class="si">{{ icon('check') }}</div><div><div class="l">Safe</div><div class="n" data-count="{{ stats.safe }}">{{ stats.safe }}</div></div></div>
+  <div class="card stat s-sus lift"><div class="si">{{ icon('alert') }}</div><div><div class="l">Suspicious</div><div class="n" data-count="{{ stats.suspicious }}">{{ stats.suspicious }}</div></div></div>
+  <div class="card stat s-phish lift"><div class="si">{{ icon('shield') }}</div><div><div class="l">Phishing</div><div class="n" data-count="{{ stats.phishing }}">{{ stats.phishing }}</div></div></div>
+</div>
+
+<div class="card quick"><h2>Quick scan</h2>
+  <form method="post" action="{{ url_for('scanner.new_scan') }}" data-loading="Analysing…"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="qs" class="sr-only">Email text</label>
+    <textarea id="qs" name="email_text" placeholder="Paste a suspicious email here…" required></textarea>
+    <div class="chips"><span class="lbl">Try:</span>
+      <button class="chip" type="button" data-example="phish" data-target="#qs">{{ icon('mail') }} Phishing</button>
+      <button class="chip" type="button" data-example="safe" data-target="#qs">{{ icon('check') }} Normal</button></div>
+    <button class="btn" type="submit">{{ icon('scan') }} Analyse</button>
+  </form></div>
+
+<div class="grid grid-2">
+  <div class="card"><h2>Classification distribution</h2>
+    {% if stats.total %}
+    <div class="donut-row">
+      <div class="donut" data-donut="{{ stats.safe }},{{ stats.suspicious }},{{ stats.phishing }}" role="img"
+           aria-label="{{ stats.safe }} safe, {{ stats.suspicious }} suspicious, {{ stats.phishing }} phishing"><span>{{ stats.total }}<small>scans</small></span></div>
+      <ul class="legend">
+        <li><i class="dot f-SAFE"></i>Safe <strong>{{ stats.safe }}</strong></li>
+        <li><i class="dot f-SUSPICIOUS"></i>Suspicious <strong>{{ stats.suspicious }}</strong></li>
+        <li><i class="dot f-PHISHING"></i>Phishing <strong>{{ stats.phishing }}</strong></li>
+        <li class="muted small">Average ML risk score: {{ stats.average_risk_score }}</li>
+      </ul>
+    </div>
+    {% else %}<div class="empty"><p>No scans yet — your charts will appear here.</p><a class="btn" href="{{ url_for('scanner.new_scan') }}">Scan your first email</a></div>{% endif %}
+  </div>
+  <div class="card"><h2>Scans — last 7 days</h2>
+    {% set mx = (stats.trend_7d|map(attribute='count')|max) or 1 %}
+    <div class="spark">{% for d in stats.trend_7d %}<div><span data-h="{{ (d.count / mx * 100)|round(0) }}"></span>{{ d.count }}<br>{{ d.date[5:] }}</div>{% endfor %}</div>
+  </div>
+</div>
+
+<div class="card"><h2>Recent scans</h2>
+{% if recent %}<div class="table-wrap"><table><thead><tr><th>When (UTC)</th><th>ML result</th><th>Risk</th><th>Rules</th><th>Preview</th></tr></thead><tbody>
+{% for s in recent %}<tr><td>{{ s.created_at.strftime('%Y-%m-%d %H:%M') }}</td><td><span class="badge b-{{ s.classification }}">{{ s.classification }}</span></td>
+<td class="riskcell"><div class="meter sm"><i class="f-{{ s.classification }}" data-w="{{ s.risk_score }}"></i></div><span class="small">{{ '%.0f'|format(s.risk_score) }}</span></td>
+<td><span class="badge b-{{ s.rule_max_severity }}">{{ s.rule_findings|length }} · {{ s.rule_max_severity }}</span></td><td><a href="{{ url_for('history.detail', scan_id=s.id) }}">{{ (s.preview or '(not stored)')[:70] }}</a></td></tr>{% endfor %}
+</tbody></table></div>{% else %}<p class="muted">Nothing here yet.</p>{% endif %}</div>
+
+<div class="card"><h2>Recent activity</h2>
+{% for a in activity %}<div class="activity"><span class="muted small">{{ a.created_at.strftime('%Y-%m-%d %H:%M') }}</span><span>{{ a.event }}</span></div>{% else %}<p class="muted">No activity.</p>{% endfor %}</div>
+{% endblock %}

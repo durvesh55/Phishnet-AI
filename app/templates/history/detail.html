@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block title %}Scan #{{ scan.id }}{% endblock %}
+{% block content %}<h1>Scan #{{ scan.id }}</h1>
+<p class="muted small">{{ scan.created_at.strftime('%Y-%m-%d %H:%M') }} UTC · source: {{ scan.source }} · {{ scan.text_length }} characters</p>
+{% include "_result_panels.html" %}
+<div class="card"><h2>Submitted text</h2>{% if scan.email_text %}<pre class="mono small wrap">{{ scan.email_text }}</pre>{% else %}<p class="muted">Text was not stored (privacy setting).</p>{% endif %}</div>
+<div class="card"><h2>Was this result correct?</h2>
+{% set fb = scan.feedback[0] if scan.feedback else None %}{% if fb %}<p class="small">Your feedback: <strong>{{ 'correct' if fb.is_correct else 'incorrect' }}</strong>{% if fb.comment %} — {{ fb.comment }}{% endif %}</p>{% endif %}
+<form method="post" action="{{ url_for('feedback.submit', scan_id=scan.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label for="comment">Comment (optional)</label><input id="comment" type="text" name="comment" maxlength="1000" value="{{ fb.comment if fb and fb.comment else '' }}">
+<p><button class="btn small" name="verdict" value="correct" type="submit">👍 Correct</button> <button class="btn small secondary" name="verdict" value="incorrect" type="submit">👎 Incorrect</button></p></form>
+<p class="small muted">Feedback is stored separately and never used to retrain the model automatically.</p></div>
+<p><a class="btn secondary" href="{{ url_for('reports.scan_pdf', scan_id=scan.id) }}">Download PDF</a>
+<form class="inline" method="post" action="{{ url_for('history.delete', scan_id=scan.id) }}" data-confirm="Delete this scan permanently?"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn danger" type="submit">Delete scan</button></form></p>
+{% endblock %}

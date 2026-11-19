@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% block title %}Scan email{% endblock %}
+{% block content %}
+<div id="scan-overlay" class="overlay" role="alert" aria-live="assertive">
+  <div class="overlay-box"><div class="radar"></div><h3>Analysing…</h3>
+    <ul><li>Extracting links and domains</li><li>Running 15 security rules</li><li>Scoring with the ML model</li><li>Saving to your history</li></ul></div>
+</div>
+<div class="dash-head"><div><h1>Scan an email</h1><p class="muted">Paste the full email (headers optional). It is analysed on this server only and links are <strong>never visited</strong>.</p></div></div>
+<div class="card">
+<form method="post" data-loading="Analysing…" data-overlay><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<div class="dropzone" data-dropzone>
+  <label for="email_text">Email text</label>
+  <textarea id="email_text" name="email_text" maxlength="{{ max_chars }}" data-counter="#count" placeholder="Paste the email here, or drop an .eml / .txt file…" required></textarea>
+  <div class="hero-tools"><div class="chips"><span class="lbl">Try an example:</span>
+    <button class="chip" type="button" data-example="phish" data-target="#email_text">{{ icon('mail') }} Phishing</button>
+    <button class="chip" type="button" data-example="safe" data-target="#email_text">{{ icon('check') }} Normal</button>
+    <label class="filebtn">{{ icon('upload') }} Choose file<input type="file" accept=".eml,.txt,text/plain"></label></div>
+    <span class="small muted"><span id="count">0</span> / {{ max_chars }}</span></div>
+</div>
+<p><button class="btn big" type="submit">{{ icon('scan') }} Analyse email</button></p></form></div>
+{% endblock %}

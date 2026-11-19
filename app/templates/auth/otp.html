@@ -1,0 +1,16 @@
+{% extends "auth/_layout.html" %}{% block title %}Two-factor verification{% endblock %}
+{% block heading %}Check your email{% endblock %}
+{% block sub %}We sent a 6-digit code. It is valid for 5 minutes.{% endblock %}
+{% block form %}
+<form method="post" data-loading="Verifying…"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="mode" value="otp">
+  <label for="code">Verification code</label>
+  <input id="code" class="otp-input" type="text" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required autofocus>
+  <button class="btn block" type="submit">Verify and sign in</button>
+</form>
+<form method="post" action="{{ url_for('auth.otp_resend') }}" class="center"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button class="linklike small" type="submit">Resend code</button></form>
+<details class="small"><summary>Use a recovery code instead</summary>
+  <form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="mode" value="recovery">
+    <label for="rc">Recovery code</label><input id="rc" type="text" name="code" placeholder="xxxx-xxxx-xxxx" required>
+    <p><button class="btn secondary block" type="submit">Use recovery code</button></p></form></details>
+{% endblock %}

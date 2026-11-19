@@ -1,0 +1,75 @@
+{% extends "base.html" %}{% block title %}Free phishing link &amp; email checker{% endblock %}
+{% block bodyclass %}landing{% endblock %}
+{% block flashes %}{% endblock %}
+{% block fullwidth %}
+<div id="scan-overlay" class="overlay" role="alert" aria-live="assertive">
+  <div class="overlay-box"><div class="radar"></div><h3>Analysing…</h3>
+    <ul><li>Extracting links and domains</li><li>Running 15 security rules</li><li>Scoring with the ML model</li><li>Building your report</li></ul></div>
+</div>
+<section class="hero">
+  <span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span>
+  <div class="hero-inner">
+    <span class="pill">{{ icon('shield') }} Free phishing link &amp; email checker</span>
+    <h1>Is that message a <span class="grad">phishing attempt?</span></h1>
+    <p class="lead">Paste a suspicious link or email. PhishNet AI runs a machine-learning model and a separate rule engine, then shows you exactly <em>why</em> something looks risky.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}<div class="alert alert-{{ cat }}" role="alert">{{ msg }}</div>{% endfor %}
+    {% endwith %}
+    <form method="post" action="{{ url_for('public.check') }}" class="hero-card" data-loading="Checking…" data-overlay>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="dropzone" data-dropzone>
+        <label for="content" class="sr-only">Link or email text</label>
+        <textarea id="content" name="content" maxlength="{{ max_chars }}" placeholder="https://secure-paypa1.com/login" required></textarea>
+        <div class="hero-tools">
+          <div class="chips"><span class="lbl">Try:</span>
+            <button class="chip" type="button" data-example="phish" data-target="#content">{{ icon('mail') }} Phishing email</button>
+            <button class="chip" type="button" data-example="link" data-target="#content">{{ icon('link') }} Suspicious link</button>
+            <button class="chip" type="button" data-example="safe" data-target="#content">{{ icon('check') }} Normal email</button>
+            <label class="filebtn">{{ icon('upload') }} Upload .eml / .txt<input type="file" accept=".eml,.txt,text/plain"></label>
+          </div>
+          <button class="btn big" type="submit">{{ icon('scan') }} Check now</button>
+        </div>
+      </div>
+    </form>
+    <p class="hero-note"><span>{{ icon('check') }} Free, no sign-up</span><span>{{ icon('lock') }} Not stored</span><span>{{ icon('link') }} Links are never visited</span></p>
+  </div>
+</section>
+<div class="statsbar reveal">
+  <div><b data-count="15">0</b><span>detection rules</span></div>
+  <div><b data-count="18">0</b><span>brands watched for impersonation</span></div>
+  <div><b data-count="2">0</b><span>independent engines</span></div>
+  <div><b data-count="0">0</b><span>links ever opened</span></div>
+</div>
+{% endblock %}
+{% block content %}
+<section class="band" id="how"><h2>How it works</h2><p class="sub">Three steps, no installation, nothing leaves our server.</p>
+  <div class="steps">
+    <div class="card step reveal lift"><span class="num">1</span><h3>Paste</h3><p class="muted">Drop in a link, the email text, or an .eml file. Nothing is opened, downloaded or executed.</p></div>
+    <div class="card step reveal lift"><span class="num">2</span><h3>Two independent analyses</h3><p class="muted">A TF-IDF + logistic-regression model scores the wording. A separate rule engine inspects links, domains and tactics.</p></div>
+    <div class="card step reveal lift"><span class="num">3</span><h3>Clear evidence</h3><p class="muted">Get a classification, a risk score, and each red flag with the exact text that triggered it.</p></div>
+  </div></section>
+
+<section class="band" id="checks"><h2>What we check</h2><p class="sub">Transparent rules you can read, not a black box.</p>
+  <div class="grid grid-3">
+    <div class="card feature reveal"><div class="fico">{{ icon('link') }}</div><h3>Link tricks</h3><p class="muted">URL shorteners, raw IP addresses, high-abuse domains, punycode look-alikes and "@" disguises.</p></div>
+    <div class="card feature reveal"><div class="fico t2">{{ icon('mirror') }}</div><h3>Lookalike domains</h3><p class="muted">Character swaps such as <code>micros0ft.com</code> or <code>paypa1.com</code> imitating well-known brands.</p></div>
+    <div class="card feature reveal"><div class="fico t3">{{ icon('lock') }}</div><h3>Credential requests</h3><p class="muted">Messages asking for passwords, PINs, card numbers or one-time codes.</p></div>
+    <div class="card feature reveal"><div class="fico t4">{{ icon('timer') }}</div><h3>Urgency &amp; threats</h3><p class="muted">"Your account will be suspended in 24 hours" pressure tactics.</p></div>
+    <div class="card feature reveal"><div class="fico t5">{{ icon('dollar') }}</div><h3>Payment lures</h3><p class="muted">Gift cards, wire transfers, prizes, refunds and "customs fees".</p></div>
+    <div class="card feature reveal"><div class="fico t6">{{ icon('paperclip') }}</div><h3>Risky attachments</h3><p class="muted">References to <code>.exe</code>, macro documents, scripts and double extensions.</p></div>
+  </div></section>
+
+<section class="band cta reveal"><h2>Need history, reports or an API?</h2>
+  <p>Create a free account to save your scans, give feedback, export PDF/CSV reports and call the REST API with your own key.</p>
+  <p><a class="btn big" href="{{ url_for('auth.register') }}">Create free account</a> <a class="btn big secondary" href="/api/docs">View API docs</a></p></section>
+
+<section class="band" id="faq"><h2>Frequently asked questions</h2><p class="sub">Straight answers about what this tool can and can't do.</p>
+  <div class="faq">
+    <details><summary>Do you visit the link I paste?</summary><p>No. Links are analysed as text only. We never fetch, resolve or open them, so checking a link cannot expose you to it. The trade-off is that we cannot see the live page or check external blocklists.</p></details>
+    <details><summary>Does "no indicators found" mean it is safe?</summary><p>No. It means our rules and model found nothing suspicious. New or well-crafted phishing can pass. When in doubt, go to the organisation's site by typing the address yourself.</p></details>
+    <details><summary>How accurate is the machine-learning score?</summary><p>The score is a model-derived risk indicator (phishing probability × 100), not a calibrated guarantee. It is only as good as its training data, and the default model is a demonstration model.</p></details>
+    <details><summary>Are my emails stored?</summary><p>Quick checks on this page are not stored. Signed-in scans are stored in your account only, and you can disable text storage, set automatic deletion, export or delete everything.</p></details>
+    <details><summary>Why is a bare link not given an ML score?</summary><p>The model learns from email wording. A link alone has too little text, so only the rule-based link analysis is shown.</p></details>
+    <details><summary>What should I do with a real phishing email?</summary><p>Do not click anything or reply. Report it to your IT team or mail provider, and change your password if you already entered it anywhere.</p></details>
+  </div></section>
+{% endblock %}

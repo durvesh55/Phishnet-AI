@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" role="img" aria-label="PhishNet AI">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a7fb8"/><stop offset="1" stop-color="#0b2a44"/>
+    </linearGradient>
+  </defs>
+  <path d="M20 2.5 34.5 7.8v10.6c0 9.2-6.1 16.3-14.5 19.1C11.6 34.7 5.5 27.6 5.5 18.4V7.8L20 2.5Z" fill="url(#g)"/>
+  <path d="M20 5.6 31.6 9.8v8.6c0 7.5-4.8 13.4-11.6 16-6.8-2.6-11.600-8.500-11.600-16V9.8L20 5.6Z" fill="none" stroke="#ffffff" stroke-opacity=".25" stroke-width="1"/>
+  <circle cx="17.200" cy="18" r="6.200" fill="none" stroke="#ffffff" stroke-width="2.200"/>
+  <path d="m21.800 22.600 5.400 5.400" stroke="#ffffff" stroke-width="2.600" stroke-linecap="round"/>
+  <path d="m14.400 18 2 2 3.600-4" fill="none" stroke="#e8590c" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

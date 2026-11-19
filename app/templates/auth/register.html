@@ -1,0 +1,16 @@
+{% extends "auth/_layout.html" %}{% block title %}Create account{% endblock %}
+{% block heading %}Create your account{% endblock %}
+{% block sub %}Free. Save scans, export reports and use the API.{% endblock %}
+{% block form %}
+<form method="post" data-loading="Creating account…"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="name">Name</label><input id="name" type="text" name="name" value="{{ name or '' }}" maxlength="100" autocomplete="name" required>
+  <label for="email">Email</label><input id="email" type="email" name="email" value="{{ email or '' }}" autocomplete="username" required>
+  <label for="password">Password</label><div class="pw-field"><input id="password" type="password" name="password" autocomplete="new-password" minlength="10" data-strength="#strength" required><button type="button" data-pw-toggle="#password" data-icons="{{ url_for('static', filename='images/icons.svg') }}" aria-label="Show password">{{ icon('eye') }}</button></div>
+  <div class="strength" id="strength" data-level="0"><i></i><i></i><i></i><i></i><span class="strength-text"></span></div>
+  <p class="small muted">At least 10 characters, mixing 3 of: lowercase, uppercase, digits, symbols.</p>
+  <label for="confirm_password">Confirm password</label><div class="pw-field"><input id="confirm_password" type="password" name="confirm_password" autocomplete="new-password"  required><button type="button" data-pw-toggle="#confirm_password" data-icons="{{ url_for('static', filename='images/icons.svg') }}" aria-label="Show password">{{ icon('eye') }}</button></div>
+  <p class="small muted">By registering you accept the <a href="{{ url_for('dashboard.privacy') }}">privacy policy</a>.</p>
+  <button class="btn block" type="submit">Create account</button>
+</form>
+<p class="small center muted">Already registered? <a href="{{ url_for('auth.login') }}">Sign in</a></p>
+{% endblock %}

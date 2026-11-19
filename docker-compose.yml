@@ -1,0 +1,66 @@
+# Local stack: app + MySQL 8 + Redis.  Usage:  cp .env.example .env  (edit)  &&  docker compose up --build
+# MySQL and Redis are on the internal network only (no published ports).
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-phishnet}
+      MYSQL_USER: ${MYSQL_USER:-phishnet}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set MYSQL_PASSWORD in .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci"]
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks: [internal]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks: [internal]
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    environment:
+      FLASK_ENV: ${FLASK_ENV:-production}
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
+      MYSQL_HOST: db
+      MYSQL_PORT: "3306"
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-phishnet}
+      MYSQL_USER: ${MYSQL_USER:-phishnet}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      REDIS_URL: redis://redis:6379/0
+      MAIL_BACKEND: ${MAIL_BACKEND:-smtp}
+      MAIL_SERVER: ${MAIL_SERVER:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-PhishNet AI <no-reply@localhost>}
+      BASE_URL: ${BASE_URL:-http://localhost:8000}
+      # Plain-HTTP local testing only: set FLASK_ENV=development in .env (production forces Secure cookies => needs HTTPS).
+    # Apply migrations, then serve.
+    command: sh -c "flask --app run db upgrade && flask --app run record-model && gunicorn --bind 0.0.0.0:8000 --workers 3 --timeout 60 --access-logfile - run:app"
+    ports:
+      - "127.0.0.1:8000:8000"   # put Nginx/HTTPS in front for anything non-local
+    networks: [internal]
+
+volumes:
+  mysql_data:
+
+networks:
+  internal:

@@ -1,0 +1,12 @@
+{% extends "auth/_layout.html" %}{% block title %}Sign in{% endblock %}
+{% block heading %}Welcome back{% endblock %}
+{% block sub %}Sign in to your PhishNet AI account.{% endblock %}
+{% block form %}
+<form method="post" data-loading="Signing in…"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label for="email">Email</label><input id="email" type="email" name="email" value="{{ email or '' }}" autocomplete="username" required>
+  <label for="password">Password</label><div class="pw-field"><input id="password" type="password" name="password" autocomplete="current-password"  required><button type="button" data-pw-toggle="#password" data-icons="{{ url_for('static', filename='images/icons.svg') }}" aria-label="Show password">{{ icon('eye') }}</button></div>
+  <p class="right small"><a href="{{ url_for('auth.forgot_password') }}">Forgot password?</a></p>
+  <button class="btn block" type="submit">Sign in</button>
+</form>
+<p class="small center muted">New here? <a href="{{ url_for('auth.register') }}">Create a free account</a> · <a href="{{ url_for('auth.verify_pending') }}">Resend verification email</a></p>
+{% endblock %}

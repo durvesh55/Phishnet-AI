@@ -1,0 +1,27 @@
+{# Shared ML + rule panels. Expects `scan` and optional `ml_ran` (default true). #}
+<div class="grid grid-2">
+<div class="card"><h2>Machine Learning Analysis</h2>
+{% if ml_ran is not defined or ml_ran %}
+<div class="gauge-wrap">
+  <div class="gauge g-{{ scan.classification }}" data-gauge="{{ scan.risk_score }}" role="img" aria-label="Risk score {{ '%.1f'|format(scan.risk_score) }} out of 100">
+    <svg viewBox="0 0 120 120"><circle class="gauge-bg" cx="60" cy="60" r="54"/><circle class="gauge-fill" cx="60" cy="60" r="54"/></svg>
+    <div class="gauge-label"><span class="gauge-num">0</span><small>risk / 100</small></div>
+  </div>
+  <div>
+    <p><span class="badge b-{{ scan.classification }}">{{ scan.classification }}</span></p>
+    <p class="small">Risk score: <strong>{{ '%.1f'|format(scan.risk_score) }}</strong> / 100<br>Model probability (phishing class): {{ '%.4f'|format(scan.ml_probability) }}<br>Model version: <span class="mono">{{ scan.model_version }}</span></p>
+  </div>
+</div>
+<p class="small muted">A model-derived risk indicator (probability × 100), not a calibrated guarantee. Rule findings do not affect this score.</p>
+<div class="tips t-{{ scan.classification }}"><strong>What to do next</strong>
+{% if scan.classification == 'PHISHING' %}<ul><li>Do not click links, open attachments or reply.</li><li>Go to the organisation's site by typing the address yourself.</li><li>Report it to your IT team or mail provider, then delete it.</li><li>If you already entered a password, change it now.</li></ul>
+{% elif scan.classification == 'SUSPICIOUS' %}<ul><li>Verify the sender through a second channel before acting.</li><li>Hover over links to inspect the real address.</li><li>If anything asks for credentials or payment, treat it as phishing.</li></ul>
+{% else %}<ul><li>The wording does not resemble the phishing examples the model learned from.</li><li>Still check the sender address and any links before acting.</li></ul>{% endif %}</div>
+{% else %}
+<p class="muted">Not run. The model is trained on email text, so a bare link or very short input is not scored. Paste the full email for an ML score.</p>
+{% endif %}</div>
+<div class="card"><h2>Security Rule Analysis</h2>
+{% if scan.rule_findings %}<p class="small muted">{{ scan.rule_findings|length }} indicator(s) · highest severity {{ scan.rule_max_severity }}. Indicators are heuristics; no link was visited or verified.</p>
+{% for f in scan.rule_findings %}<div class="finding {{ f.severity }}"><span class="badge b-{{ f.severity }}">{{ f.severity }}</span> <strong>{{ f.title }}</strong><div class="small muted">{{ f.reason }}</div>
+{% for e in f.evidence %}<code>{{ e }}</code>{% endfor %}</div>{% endfor %}
+{% else %}<p>No rule-based indicators detected. <span class="muted small">This is not proof that the content is safe.</span></p>{% endif %}</div></div>
